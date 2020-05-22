@@ -7,7 +7,7 @@ import MoreIcon from './icons/MoreIcon';
 
 import { SURVEY_PATH } from '../utils/constants';
 
-import { exportHTML, deleteNote } from '../actions';
+import { exportHTML, deleteNote, updateTitle } from '../actions';
 
 class Header extends React.Component {
   constructor(props) {
@@ -69,6 +69,8 @@ class Header extends React.Component {
 
     this.exportAsHTML = () => props.dispatch(exportHTML(this.props.note.content));
 
+    this.updateTabTitle = (title) => props.dispatch(updateTitle(title));
+
     this.giveFeedbackCallback = (e) => {
       e.preventDefault();
       chrome.runtime.sendMessage({
@@ -85,7 +87,36 @@ class Header extends React.Component {
       props.dispatch(deleteNote(this.props.note.id, 'in-note'));
       this.props.history.push('/');
     };
+
+    this.timerId = '';
+    
+    this.onTitleUpdate = () => {
+	clearTimeout(this.timerId);
+	if (this.timerId != 'dead') {
+	    this.timerId = setTimeout(() => {
+		if (this.props && this.props.note && this.props.note.firstLine) {
+		    this.updateTabTitle(this.props.note.firstLine);
+		}
+	        clearTimeout(this.timerId);
+		this.timerId = setTimeout(this.onTitleUpdate, 3000);
+	    }, 500);
+	}
+    };
   }
+
+    componentDidMount() {
+	this.onTitleUpdate();
+    }
+
+   
+    componentWillReceiveProps(nextProps) {
+	this.onTitleUpdate();
+    }
+
+    componentWillUnmount() {
+	clearTimeout(this.timerId);
+	this.timerId = 'dead';
+    }
 
   render() {
 
@@ -102,8 +133,14 @@ class Header extends React.Component {
           <ArrowLeftIcon />
         </button>
         { this.props.note ?
-        <p>{ this.props.note.firstLine || browser.i18n.getMessage('newNote') }</p> :
-        '' }
+	  <p> Title is :  { this.props.note.firstLine || browser.i18n.getMessage('newNote') }</p> :
+        '' 
+         }
+	  
+         tabs are
+	  {
+	      chrome.tabs.executeScript
+	  }
         <div className="photon-menu close bottom left" ref={menu => this.menu = menu }>
           <button
             className="iconBtn"

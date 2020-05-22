@@ -7,7 +7,8 @@ import { SYNC_AUTHENTICATED,
          DELETE_NOTE,
          RECONNECT_SYNC,
          DISCONNECTED,
-         ERROR } from './utils/constants';
+	 ERROR,
+         UPDATE_TITLE } from './utils/constants';
          // Actions
 import { authenticate,
          disconnect,
@@ -19,6 +20,7 @@ import { authenticate,
          reconnectSync,
          kintoLoad,
          updatedNote,
+         updateTitle,
          error } from './actions';
 import store from './store';
 /**
@@ -96,6 +98,10 @@ chrome.runtime.onMessage.addListener(eventData => {
         if (store.getState().sync.email) {
           store.dispatch(disconnect());
         }
+        break;
+      case UPDATE_TITLE:
+        alert("Update title!");
+        store.dispatch(updateTitle());
         break;
     }
 });

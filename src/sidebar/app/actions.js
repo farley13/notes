@@ -13,6 +13,7 @@ import { SYNC_AUTHENTICATED,
          OPENING_LOGIN,
          FOCUS_NOTE,
          ERROR,
+         UPDATE_TITLE,
          REQUEST_WELCOME_PAGE } from './utils/constants';
 
 import INITIAL_CONTENT from './data/initialContent';
@@ -129,6 +130,30 @@ export function deletedNote(id) {
 export function deleteNote(id, origin) {
   chrome.runtime.sendMessage({ action: 'delete-note', id, origin});
   return { type: DELETE_NOTE, id, isSyncing: true };
+}
+
+export function updateTitle(title) {
+    
+    var currentWindowPromise = browser.windows.getCurrent({ populate: true });
+    currentWindowPromise.then((windowInfo) => {
+
+	    for (let tabInfo of windowInfo.tabs) {
+		var tabId = tabInfo.id;
+		chrome.tabs.executeScript(tabId, {
+			code : "title='" + title + "'; " + `
+			if (title) { 
+			    existingTitle = document.title.split(' -: ',2)[1]
+			    if (existingTitle) {
+				document.title = title + ' -: ' + existingTitle;
+			    } else {
+				document.title = title + ' -: ' + document.title;
+			    }
+			}`
+		    });
+	    }
+	});
+	
+    return { type: UPDATE_TITLE };
 }
 
 

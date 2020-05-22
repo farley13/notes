@@ -28,3 +28,5 @@ export const FROM_IN_NOTE = 'in-note';
 export const FROM_LIST_VIEW = 'list-view';
 export const FROM_BLANK_NOTE = 'blank-note';
 export const FROM_SEND_TO_NOTE = 'send-to-note';
+
+export const UPDATE_TITLE = 'update-title';
